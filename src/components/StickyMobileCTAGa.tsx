@@ -13,7 +13,7 @@ export const StickyMobileCTA = ({ onCTAClick }: StickyMobileCTAProps) => {
           <span className="text-sm font-bold text-red-900">Limited seats</span>
           <CountdownTimer className="scale-75 origin-left" />
         </div>
-        <Link to="/oto-fb">
+        <Link to="/oto-ga">
         <Button variant="gold" size="lg" onClick={onCTAClick} className="flex-1 max-w-[180px]">
           Book @ ₹99
         </Button>

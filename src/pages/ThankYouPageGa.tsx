@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useFacebookPixel } from "@/hooks/useFacebookPixel";
 
 
-export const ThankYouPage = () => {
+export const ThankYouPageGa = () => {
     useFacebookPixel({
     eventName: "Purchase NNW",
     eventParams: {

@@ -113,7 +113,7 @@ export const HeroSection = () => {
 
 
                 {/* INTERNAL ROUTE CTA */}
-                <Link to="/oto-fb">
+                <Link to="/oto-ga">
                   <button
                     className="
                       w-full

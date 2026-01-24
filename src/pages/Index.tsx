@@ -10,22 +10,15 @@ import { MentorSection } from '@/components/sections/MentorSection';
 import { FAQSection } from '@/components/sections/FAQSection';
 import { FinalCTASection } from '@/components/sections/FinalCTASection';
 import { StickyMobileCTA } from '@/components/StickyMobileCTA';
-import { loadMetaPixel } from '@/lib/metaPixel';
+import { useFacebookPixel } from "@/hooks/useFacebookPixelHome";
 
-const FB_PIXEL_LP2 = '4315896568733973';
 
 const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Example condition
-    const variant = new URLSearchParams(window.location.search).get('variant');
+useFacebookPixel()
 
-    if (variant === 'fb') {
-      loadMetaPixel(FB_PIXEL_LP2);
-      window.fbq?.('track', 'PageView');
-    }
-  }, []);
+
 
   const scrollToHero = () => {
     heroRef.current?.scrollIntoView({ behavior: 'smooth' });

@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUTMParams, buildRazorpayURL } from '@/hooks/useUTMParams';
 import { User, Mail, Phone, MapPin, Loader2 } from 'lucide-react';
-import { loadMetaPixel } from '@/lib/metaPixel';
+import { useFacebookPixel } from "@/hooks/useFacebookPixel";
+
 
 const RAZORPAY_BASE_URL = 'https://pages.razorpay.com/pl_RkKu9mBvHqnbE1/view'; // Replace with actual Razorpay link
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNqQghsxa10pLaJKRryPO0fs0-02M4diS9pJ2RwZVisD0KeN5q97BZehzijb1LBKLlRQ/exec'; // Add your Google Apps Script Web App URL here
@@ -22,7 +23,31 @@ interface FormErrors {
   city?: string;
 }
 
-export const LeadCaptureForm = () => {
+interface LeadCaptureFormProps {
+  upgrade499?: boolean;
+}
+
+
+export const LeadCaptureForm = ({ upgrade499 = false }: LeadCaptureFormProps) => {
+
+  const [fireAddToCart, setFireAddToCart] = useState(false);
+
+  useFacebookPixel(
+  fireAddToCart
+    ? {
+        eventName: "AddToCart",
+        eventParams: {
+          content_name: "LP2_Product",
+          content_category: "LP2_Offer",
+          content_ids: ["LP2_IN_99"],
+          content_type: "product",
+          value: 99,
+          currency: "INR",
+        },
+      }
+    : undefined
+);
+
   const utmParams = useUTMParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -95,20 +120,12 @@ export const LeadCaptureForm = () => {
     
     setIsSubmitting(true);
     
+    setFireAddToCart(true);
+    
     // Send to Google Sheets first
     await sendToGoogleSheets();
 
-    loadMetaPixel('4315896568733973');
-
-    // 2️⃣ Fire Purchase event AFTER load
-    window.fbq?.('trackCustom', 'Purchase NNW', {
-      content_name: 'LP2_Product',
-      content_category: 'LP2_Offer',
-      content_ids: ['LP2_IN_99'],
-      content_type: 'product',
-      value: 99,
-      currency: 'INR',
-    });
+    
     
   
     // Build Razorpay URL with all parameters

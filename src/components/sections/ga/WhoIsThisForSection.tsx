@@ -36,7 +36,7 @@ export const WhoIsThisForSection = ({ onCTAClick }: WhoIsThisForSectionProps) =>
           </div>
           
           <div className="text-center">
-            <Link to="/oto-fb">
+            <Link to="/oto-ga">
             <Button variant="gold" size="xl" >
               Book Now @ ₹99
             </Button>

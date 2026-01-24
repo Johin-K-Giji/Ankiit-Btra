@@ -47,7 +47,7 @@ export const FinalCTASection = ({ onCTAClick }: FinalCTASectionProps) => {
             <div className="flex justify-center mb-6">
               <CountdownTimer />
             </div>
-            <Link to="/oto-fb">
+            <Link to="/oto-ga">
             <Button variant="hero" size="xl" onClick={onCTAClick} className="w-full md:w-auto">
               Book My Seat @ ₹99
               <ArrowRight className="h-5 w-5" />

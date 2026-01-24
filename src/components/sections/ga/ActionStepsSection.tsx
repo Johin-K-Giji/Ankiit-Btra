@@ -120,7 +120,7 @@ export const ActionStepsSection = ({ onCTAClick }: ActionStepsSectionProps) => {
 
             {/* CTA */}
             <div className="text-center">
-              <Link to="/oto-fb">
+              <Link to="/oto-ga">
               <Button variant="gold" size="xl">
                 Book Now @ ₹99
               </Button>
