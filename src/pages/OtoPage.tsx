@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -20,6 +20,8 @@ interface FormData {
   phone: string;
   city: string;
   dob: string;
+  gender: string;
+  courseName: string;
 }
 
 interface FormErrors {
@@ -28,10 +30,14 @@ interface FormErrors {
   phone?: string;
   city?: string;
   dob?: string;
+  gender?: string;
 }
 
 export default function OtoPage() {
   const utmParams = useUTMParams();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const prefilledDob = urlParams.get("dob") || "";
 
   const [upgrade499, setUpgrade499] = useState(false);
   const [fireAddToCart, setFireAddToCart] = useState(false);
@@ -42,7 +48,9 @@ export default function OtoPage() {
     email: "",
     phone: "",
     city: "",
-    dob: "",
+    dob: prefilledDob,
+    gender: "",
+    courseName: "Name Numerology NNW Workshop - FB1",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -64,12 +72,23 @@ export default function OtoPage() {
       : undefined
   );
 
+  /* ✅ UPDATE COURSE NAME WHEN CHECKBOX CHANGES */
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      courseName: upgrade499
+        ? "Name Numerology NNW Workshop + 5 Year Destiny Report - FB"
+        : "Name Numerology NNW Workshop - FB1",
+      gender: upgrade499 ? prev.gender : "",
+      dob: upgrade499 ? prev.dob : "",
+    }));
+  }, [upgrade499]);
+
   /* ✅ VALIDATION */
   const validateForm = () => {
     const newErrors: FormErrors = {};
 
     if (!formData.name.trim()) newErrors.name = "Name is required";
-
     if (!formData.email.trim())
       newErrors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
@@ -80,9 +99,11 @@ export default function OtoPage() {
 
     if (!formData.city.trim()) newErrors.city = "City is required";
 
-    if (upgrade499 && !formData.dob) {
+    if (upgrade499 && !formData.dob)
       newErrors.dob = "Date of Birth is required";
-    }
+
+    if (upgrade499 && !formData.gender)
+      newErrors.gender = "Gender is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -117,10 +138,17 @@ export default function OtoPage() {
       utmParams
     );
 
-    // ✅ PASS DOB EXPLICITLY FOR ₹499 FLOW
-    if (upgrade499 && formData.dob) {
-      const sep = razorpayURL.includes("?") ? "&" : "?";
-      razorpayURL += `${sep}dob=${encodeURIComponent(formData.dob)}`;
+    const sep = razorpayURL.includes("?") ? "&" : "?";
+
+    razorpayURL += `${sep}course_name=${encodeURIComponent(
+      formData.courseName
+    )}`;
+
+    if (upgrade499) {
+      if (formData.dob)
+        razorpayURL += `&date_of_birth=${encodeURIComponent(formData.dob)}`;
+      if (formData.gender)
+        razorpayURL += `&gender=${encodeURIComponent(formData.gender)}`;
     }
 
     window.location.href = razorpayURL;
@@ -168,11 +196,6 @@ export default function OtoPage() {
                 onChange={handleChange(key as keyof FormData)}
                 className="pl-10 h-12"
               />
-              {errors[key as keyof FormErrors] && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors[key as keyof FormErrors]}
-                </p>
-              )}
             </div>
           ))}
 
@@ -196,17 +219,36 @@ export default function OtoPage() {
 
           {/* DOB */}
           {upgrade499 && (
-            <div>
+            <>
               <Input
                 type="date"
                 value={formData.dob}
                 onChange={handleChange("dob")}
                 className="h-12"
               />
-              {errors.dob && (
-                <p className="text-xs text-red-500 mt-1">{errors.dob}</p>
+
+              {/* GENDER */}
+              <div className="flex gap-4 text-sm">
+                {["male", "female"].map((g) => (
+                  <label key={g} className="flex items-center gap-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value={g}
+                      checked={formData.gender === g}
+                      onChange={(e) =>
+                        setFormData({ ...formData, gender: e.target.value })
+                      }
+                    />
+                    {g.charAt(0).toUpperCase() + g.slice(1)}
+                  </label>
+                ))}
+              </div>
+
+              {errors.gender && (
+                <p className="text-xs text-red-500">{errors.gender}</p>
               )}
-            </div>
+            </>
           )}
 
           <Button type="submit" size="xl" className="w-full" disabled={isSubmitting}>
@@ -220,10 +262,6 @@ export default function OtoPage() {
               "Book My Seat @ ₹99"
             )}
           </Button>
-
-          <p className="text-xs text-center text-muted-foreground">
-            🔒 Your information is 100% secure
-          </p>
         </form>
       </div>
     </section>

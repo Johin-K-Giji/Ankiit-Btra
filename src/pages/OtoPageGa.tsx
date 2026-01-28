@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -7,9 +7,9 @@ import { useUTMParams, buildRazorpayURL } from "@/hooks/useUTMParams";
 import { useFacebookPixel } from "@/hooks/useFacebookPixel";
 
 const RAZORPAY_99_URL =
-  "https://pages.razorpay.com/pl_S6ZzAUJvTI85fv/view";
+  "https://pages.razorpay.com/pl_S6ZxgWS0ZZvgE2/view";
 const RAZORPAY_499_URL =
-  "https://pages.razorpay.com/pl_S6aUNMA8f5PS77/view";
+  "https://pages.razorpay.com/pl_S6aRnHuQsmGTB4/view";
 
 const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbyNqQghsxa10pLaJKRryPO0fs0-02M4diS9pJ2RwZVisD0KeN5q97BZehzijb1LBKLlRQ/exec";
@@ -20,6 +20,7 @@ interface FormData {
   phone: string;
   city: string;
   dob: string;
+  courseName: string;
 }
 
 interface FormErrors {
@@ -30,8 +31,11 @@ interface FormErrors {
   dob?: string;
 }
 
-export default function OtoPageGa() {
+export default function OtoPage() {
   const utmParams = useUTMParams();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const prefilledDob = urlParams.get("dob") || "";
 
   const [upgrade499, setUpgrade499] = useState(false);
   const [fireAddToCart, setFireAddToCart] = useState(false);
@@ -42,20 +46,44 @@ export default function OtoPageGa() {
     email: "",
     phone: "",
     city: "",
-    dob: "",
+    dob: prefilledDob, // ✅ AUTOFILL DOB
+    courseName: "Name Numerology NNW Workshop - FB1",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
 
   /* 🔥 FACEBOOK PIXEL — DO NOT CHANGE */
-  
+  useFacebookPixel(
+    fireAddToCart
+      ? {
+          eventName: "AddToCart",
+          eventParams: {
+            content_name: "LP2_Product",
+            content_category: upgrade499 ? "LP2_Offer_499" : "LP2_Offer_99",
+            content_ids: [upgrade499 ? "LP2_IN_499" : "LP2_IN_99"],
+            content_type: "product",
+            value: upgrade499 ? 499 : 99,
+            currency: "INR",
+          },
+        }
+      : undefined
+  );
+
+  /* ✅ UPDATE COURSE NAME WHEN CHECKBOX CHANGES */
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      courseName: upgrade499
+        ? "Name Numerology NNW Workshop + 5 Year Destiny Report - FB"
+        : "Name Numerology NNW Workshop - FB1",
+    }));
+  }, [upgrade499]);
 
   /* ✅ VALIDATION */
   const validateForm = () => {
     const newErrors: FormErrors = {};
 
     if (!formData.name.trim()) newErrors.name = "Name is required";
-
     if (!formData.email.trim())
       newErrors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
@@ -66,9 +94,8 @@ export default function OtoPageGa() {
 
     if (!formData.city.trim()) newErrors.city = "City is required";
 
-    if (upgrade499 && !formData.dob) {
+    if (upgrade499 && !formData.dob)
       newErrors.dob = "Date of Birth is required";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -103,10 +130,14 @@ export default function OtoPageGa() {
       utmParams
     );
 
-    // ✅ PASS DOB EXPLICITLY FOR ₹499 FLOW
+    const sep = razorpayURL.includes("?") ? "&" : "?";
+
+    razorpayURL += `${sep}course_name=${encodeURIComponent(
+      formData.courseName
+    )}`;
+
     if (upgrade499 && formData.dob) {
-      const sep = razorpayURL.includes("?") ? "&" : "?";
-      razorpayURL += `${sep}dob=${encodeURIComponent(formData.dob)}`;
+      razorpayURL += `&dob=${encodeURIComponent(formData.dob)}`;
     }
 
     window.location.href = razorpayURL;
@@ -154,11 +185,6 @@ export default function OtoPageGa() {
                 onChange={handleChange(key as keyof FormData)}
                 className="pl-10 h-12"
               />
-              {errors[key as keyof FormErrors] && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors[key as keyof FormErrors]}
-                </p>
-              )}
             </div>
           ))}
 
@@ -206,10 +232,6 @@ export default function OtoPageGa() {
               "Book My Seat @ ₹99"
             )}
           </Button>
-
-          <p className="text-xs text-center text-muted-foreground">
-            🔒 Your information is 100% secure
-          </p>
         </form>
       </div>
     </section>
