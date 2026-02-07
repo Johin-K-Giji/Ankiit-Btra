@@ -10,7 +10,7 @@ export const ThankYouPageOtoFb = () => {
       content_category: "LP2_OTO",
       content_ids: ["LP2_IN_OTO_199"],
       content_type: "product",
-      value: 199,
+      value: 499,
       currency: "INR",
     },
   });

@@ -4,6 +4,12 @@
   padding: 2rem;
   text-align: center;
 }
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
 
 .logo {
   height: 6em;

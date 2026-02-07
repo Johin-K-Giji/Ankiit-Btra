@@ -12,6 +12,10 @@ import OtoPageGa from "./pages/OtoPageGa";
 import { ThankYouPageOtoGa } from "./pages/ThankuPageOtoGa";
 import { ThankYouPageGa } from "./pages/ThankYouPageGa";
 import IndexGa from "./pages/IndexGa";
+import { OTOWatchPage } from "./pages/OTOWatchPage";
+import { OTOThankYouPage } from "./pages/OTOThankYouPage";
+import Watch from "./pages/Watch";
+import { ThankYouPageWatch } from "./pages/ThankuWatch";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +34,13 @@ const App = () => (
            <Route path="/ty-ga" element={<ThankYouPageGa/>}/>
           <Route path="/oto-ga" element={<OtoPageGa/>}/>
           <Route path="/ty-oto-ga" element={<ThankYouPageOtoGa/>} />
+
+          {/* oto watch */}
+          <Route path="/watch-fb" element={<Watch/>}/>
+          <Route path="/watch-fb-ty" element={<ThankYouPageWatch/>}/>
+          <Route path="/oto-watch-fb" element={<OTOWatchPage/>}/>
+          <Route path="/oto-watch-fb-ty" element={<OTOThankYouPage/>}/>
+
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

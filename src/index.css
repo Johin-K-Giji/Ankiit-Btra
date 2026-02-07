@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
 @layer base {
   :root {
     /* Deep Indigo / Royal Purple Primary */
@@ -227,3 +234,27 @@
   transform: scale(1.03);
 }
 
+/* ===== LOGO MARQUEE (NO OVERFLOW VERSION) ===== */
+
+/* ===== ABSOLUTE SAFE AUTO-SCROLL (NO OVERFLOW) ===== */
+
+.logo-marquee {
+  will-change: transform;
+  animation: logo-marquee-move 10s linear infinite;
+}
+
+@keyframes logo-marquee-move {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* 🔒 HARD STOP HORIZONTAL OVERFLOW (MOBILE FIX) */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
