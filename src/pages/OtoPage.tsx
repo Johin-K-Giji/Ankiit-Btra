@@ -89,13 +89,18 @@ export default function OtoPage() {
     const newErrors: FormErrors = {};
 
     if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.email.trim())
-      newErrors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      newErrors.email = "Enter a valid email";
 
-    if (!/^[6-9]\d{9}$/.test(formData.phone))
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Enter a valid email";
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^[6-9]\d{9}$/.test(formData.phone)) {
       newErrors.phone = "Enter valid 10-digit number";
+    }
 
     if (!formData.city.trim()) newErrors.city = "City is required";
 
@@ -125,6 +130,7 @@ export default function OtoPage() {
   /* ✅ SUBMIT */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
@@ -183,19 +189,35 @@ export default function OtoPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {[
             { key: "name", icon: User, placeholder: "Full Name" },
-            { key: "email", icon: Mail, placeholder: "Email Address", type: "email" },
+            {
+              key: "email",
+              icon: Mail,
+              placeholder: "Email Address",
+              type: "email",
+            },
             { key: "phone", icon: Phone, placeholder: "Phone Number" },
             { key: "city", icon: MapPin, placeholder: "City" },
           ].map(({ key, icon: Icon, placeholder, type }) => (
-            <div key={key} className="relative">
-              <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <div key={key} className="relative space-y-1">
+              <Icon className="absolute left-3 top-6 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+
               <Input
                 type={type || "text"}
                 placeholder={placeholder}
                 value={(formData as any)[key]}
                 onChange={handleChange(key as keyof FormData)}
-                className="pl-10 h-12"
+                className={`pl-10 h-12 ${
+                  errors[key as keyof FormErrors]
+                    ? "border-red-500 focus-visible:ring-red-500"
+                    : ""
+                }`}
               />
+
+              {errors[key as keyof FormErrors] && (
+                <p className="text-xs text-red-500">
+                  {errors[key as keyof FormErrors]}
+                </p>
+              )}
             </div>
           ))}
 
@@ -217,28 +239,44 @@ export default function OtoPage() {
             </span>
           </label>
 
-          {/* DOB */}
+          {/* DOB + GENDER */}
           {upgrade499 && (
             <>
-              <Input
-                type="date"
-                value={formData.dob}
-                onChange={handleChange("dob")}
-                className="h-12"
-              />
+              <div className="space-y-1">
+                <Input
+                  type="date"
+                  value={formData.dob}
+                  onChange={handleChange("dob")}
+                  className={`h-12 ${
+                    errors.dob
+                      ? "border-red-500 focus-visible:ring-red-500"
+                      : ""
+                  }`}
+                />
 
-              {/* GENDER */}
+                {errors.dob && (
+                  <p className="text-xs text-red-500">{errors.dob}</p>
+                )}
+              </div>
+
               <div className="flex gap-4 text-sm">
                 {["male", "female"].map((g) => (
-                  <label key={g} className="flex items-center gap-1 cursor-pointer">
+                  <label
+                    key={g}
+                    className="flex items-center gap-1 cursor-pointer"
+                  >
                     <input
                       type="radio"
                       name="gender"
                       value={g}
                       checked={formData.gender === g}
-                      onChange={(e) =>
-                        setFormData({ ...formData, gender: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setFormData({
+                          ...formData,
+                          gender: e.target.value,
+                        });
+                        setErrors({ ...errors, gender: undefined });
+                      }}
                     />
                     {g.charAt(0).toUpperCase() + g.slice(1)}
                   </label>
@@ -251,7 +289,12 @@ export default function OtoPage() {
             </>
           )}
 
-          <Button type="submit" size="xl" className="w-full" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            size="xl"
+            className="w-full"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="animate-spin mr-2" /> Processing…
